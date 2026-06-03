@@ -39,8 +39,8 @@ src/
 ## Gotchas
 
 - **ESM only**: use `.js` extensions in TypeScript imports.
-- **Global local install**: run `npm run build && npm link`; do not rely on the old dotfiles script.
+- **Global local install**: run `npm run build && npm link` to use your checkout as the global CLI.
 - **No live fan-out in tests**: stub `cmux` and `claude` with a temp `PATH`.
 - **Linear token safety**: only send `LINEAR_API_KEY` to trusted Linear API/upload hosts.
 - **Launch cwd matters**: Claude must start from the new worktree, not the source repo that spawned the command.
-- **Behavior parity matters**: this project replaces `/Users/mblode/dotfiles/bin/linear-worktree`; preserve the current modes before adding new features.
+- **Behavior parity matters**: preserve the existing launch modes (single-issue, fan-out, `--print`) before adding new features.
