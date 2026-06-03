@@ -4,19 +4,8 @@ Create git worktrees for Linear issues and launch Claude sessions.
 
 ## Installation
 
-For local global use from this checkout:
-
 ```bash
-npm install
-npm run build
-npm link
-```
-
-Verify:
-
-```bash
-command -v linear-worktree
-linear-worktree --help
+npm i -g linear-worktree
 ```
 
 ## Usage
@@ -28,13 +17,18 @@ linear-worktree --print ENG-403
 linear-worktree --repo ~/Code/acme/web ENG-403
 ```
 
-## Behavior
+## How it works
 
-- One issue creates a sibling git worktree and launches `claude --dangerously-skip-permissions` inside it.
-- Many bare issue IDs fan out one cmux workspace per issue.
-- `--print` creates the worktree, prints the prompt, and skips launch.
-- Repo detection checks `--repo`, then `~/.config/linear-worktree/repos.json`, then the current repo or `LINEAR_WORKTREE_REPO`.
-- `LINEAR_API_KEY` enables Linear GraphQL prompt enrichment and screenshot downloads.
+For one issue, it runs in order:
+
+1. Find the repo — `--repo`, then `~/.config/linear-worktree/repos.json`, then the current repo, then `LINEAR_WORKTREE_REPO`.
+2. Fetch the issue from Linear (needs `LINEAR_API_KEY`), including screenshots.
+3. Create a sibling git worktree and branch.
+4. Launch the session — a focused [cmux](https://cmux.com/) workspace running `claude` in plan mode, or `claude` inline if cmux isn't running.
+
+For multiple issues, it opens one [cmux](https://cmux.com/) workspace each. cmux is required here — there's no inline fallback.
+
+`--print` stops after step 3: it prints the prompt and copies a `cd` into the worktree.
 
 ## Programmatic API
 
@@ -51,7 +45,7 @@ The canonical skill lives at `skills/linear-worktree/SKILL.md` in this repo.
 - Node.js >= 22
 - git
 - `claude` on PATH for launch mode
-- `cmux` on PATH for multi-issue fan-out
+- [`cmux`](https://cmux.com/) on PATH — required for multiple issues; the preferred launcher for a single issue when available
 
 ## License
 
