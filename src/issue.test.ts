@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { parseIssueInput, slugify } from "./issue.js";
 
 describe("issue parsing", () => {
@@ -19,7 +20,11 @@ describe("issue parsing", () => {
   });
 
   it("parses Linear issue URLs", () => {
-    expect(parseIssueInput("https://linear.app/linktree/issue/TIG-423/add-launch-mode?foo=bar")).toEqual({
+    expect(
+      parseIssueInput(
+        "https://linear.app/linktree/issue/TIG-423/add-launch-mode?foo=bar"
+      )
+    ).toEqual({
       displayId: "TIG-423",
       issueId: "tig-423",
       slug: "add-launch-mode",
@@ -27,6 +32,10 @@ describe("issue parsing", () => {
   });
 
   it("truncates slugs without leaving partial trailing words", () => {
-    expect(slugify("this is a very long issue title that should be cut at a stable word boundary")).toBe("this-is-a-very-long-issue-title-that-should-be-cut-at-a");
+    expect(
+      slugify(
+        "this is a very long issue title that should be cut at a stable word boundary"
+      )
+    ).toBe("this-is-a-very-long-issue-title-that-should-be-cut-at-a");
   });
 });

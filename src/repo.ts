@@ -1,18 +1,19 @@
 import { existsSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
+
 import { CliError } from "./errors.js";
 import { run } from "./shell.js";
 import type { ResolvedRepo } from "./types.js";
 
-type ResolveRepoOptions = {
+interface ResolveRepoOptions {
   cwd: string;
   env: NodeJS.ProcessEnv;
   issueId: string;
   repoOverride?: string;
-};
+}
 
-export function expandTilde(value: string, home = homedir()): string {
+export const expandTilde = (value: string, home = homedir()): string => {
   if (value === "~") {
     return home;
   }
@@ -20,9 +21,67 @@ export function expandTilde(value: string, home = homedir()): string {
     return join(home, value.slice(2));
   }
   return value;
-}
+};
 
-export function resolveRepo(options: ResolveRepoOptions): ResolvedRepo {
+const gitTopLevel = (
+  cwd: string,
+  env: NodeJS.ProcessEnv
+): string | undefined => {
+  const result = run("git", ["-C", cwd, "rev-parse", "--show-toplevel"], {
+    env,
+  });
+  if (result.status !== 0) {
+    return undefined;
+  }
+  return result.stdout.trim();
+};
+
+const resolveTeamRepo = (
+  issueId: string,
+  env: NodeJS.ProcessEnv
+): ResolvedRepo | undefined => {
+  const team = issueId.split("-")[0]?.toUpperCase();
+  if (!team) {
+    return undefined;
+  }
+
+  const configPath = join(
+    homedir(),
+    ".config",
+    "linear-worktree",
+    "repos.json"
+  );
+  if (!existsSync(configPath)) {
+    return undefined;
+  }
+
+  let map: Record<string, string>;
+  try {
+    map = JSON.parse(readFileSync(configPath, "utf-8")) as Record<
+      string,
+      string
+    >;
+  } catch {
+    return undefined;
+  }
+
+  const configured = map[team];
+  if (!configured) {
+    return undefined;
+  }
+
+  const expanded = expandTilde(configured);
+  const repo = gitTopLevel(expanded, env);
+  if (!repo) {
+    throw new CliError(
+      `configured repo for ${team} is not a git repo: ${expanded}`
+    );
+  }
+
+  return { repoRoot: repo, source: "team-map" };
+};
+
+export const resolveRepo = (options: ResolveRepoOptions): ResolvedRepo => {
   if (options.repoOverride) {
     const repo = gitTopLevel(expandTilde(options.repoOverride), options.env);
     if (repo) {
@@ -42,51 +101,16 @@ export function resolveRepo(options: ResolveRepoOptions): ResolvedRepo {
   }
 
   if (options.env.LINEAR_WORKTREE_REPO) {
-    const envRepo = gitTopLevel(expandTilde(options.env.LINEAR_WORKTREE_REPO), options.env);
+    const envRepo = gitTopLevel(
+      expandTilde(options.env.LINEAR_WORKTREE_REPO),
+      options.env
+    );
     if (envRepo) {
       return { repoRoot: envRepo, source: "env" };
     }
   }
 
-  throw new CliError(`not in a git repo and no repo mapping for ${options.issueId.toUpperCase()} (use --repo, configure ~/.config/linear-worktree/repos.json, or set LINEAR_WORKTREE_REPO)`);
-}
-
-function resolveTeamRepo(issueId: string, env: NodeJS.ProcessEnv): ResolvedRepo | undefined {
-  const team = issueId.split("-")[0]?.toUpperCase();
-  if (!team) {
-    return undefined;
-  }
-
-  const configPath = join(homedir(), ".config", "linear-worktree", "repos.json");
-  if (!existsSync(configPath)) {
-    return undefined;
-  }
-
-  let map: Record<string, string>;
-  try {
-    map = JSON.parse(readFileSync(configPath, "utf8")) as Record<string, string>;
-  } catch {
-    return undefined;
-  }
-
-  const configured = map[team];
-  if (!configured) {
-    return undefined;
-  }
-
-  const expanded = expandTilde(configured);
-  const repo = gitTopLevel(expanded, env);
-  if (!repo) {
-    throw new CliError(`configured repo for ${team} is not a git repo: ${expanded}`);
-  }
-
-  return { repoRoot: repo, source: "team-map" };
-}
-
-function gitTopLevel(cwd: string, env: NodeJS.ProcessEnv): string | undefined {
-  const result = run("git", ["-C", cwd, "rev-parse", "--show-toplevel"], { env });
-  if (result.status !== 0) {
-    return undefined;
-  }
-  return result.stdout.trim();
-}
+  throw new CliError(
+    `not in a git repo and no repo mapping for ${options.issueId.toUpperCase()} (use --repo, configure ~/.config/linear-worktree/repos.json, or set LINEAR_WORKTREE_REPO)`
+  );
+};

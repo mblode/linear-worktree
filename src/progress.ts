@@ -3,30 +3,30 @@ const INTERVAL_MS = 80;
 const LABEL = "linear-worktree";
 const CLEAR_LINE = "\r[2K";
 
-export type Progress = {
+export interface Progress {
   step: (message: string) => void;
   done: (message?: string) => void;
-};
-
-export function withPrefix(progress: Progress, prefix: string): Progress {
-  return {
-    step: (message) => progress.step(`${prefix}${message}`),
-    done: (message) => progress.done(message ? `${prefix}${message}` : undefined),
-  };
 }
 
-export function createProgress(stream: NodeJS.WritableStream = process.stderr): Progress {
+export const withPrefix = (progress: Progress, prefix: string): Progress => ({
+  done: (message) => progress.done(message ? `${prefix}${message}` : undefined),
+  step: (message) => progress.step(`${prefix}${message}`),
+});
+
+export const createProgress = (
+  stream: NodeJS.WritableStream = process.stderr
+): Progress => {
   const isTty = Boolean((stream as Partial<NodeJS.WriteStream>).isTTY);
 
   if (!isTty) {
     return {
-      step(message) {
-        stream.write(`[${LABEL}] ${message}\n`);
-      },
       done(message) {
         if (message) {
           stream.write(`[${LABEL}] ${message}\n`);
         }
+      },
+      step(message) {
+        stream.write(`[${LABEL}] ${message}\n`);
       },
     };
   }
@@ -41,16 +41,6 @@ export function createProgress(stream: NodeJS.WritableStream = process.stderr): 
   };
 
   return {
-    step(message) {
-      current = message;
-      if (!timer) {
-        timer = setInterval(render, INTERVAL_MS);
-        if (typeof timer.unref === "function") {
-          timer.unref();
-        }
-      }
-      render();
-    },
     done(message) {
       if (timer) {
         clearInterval(timer);
@@ -61,5 +51,15 @@ export function createProgress(stream: NodeJS.WritableStream = process.stderr): 
         stream.write(`[${LABEL}] ${message}\n`);
       }
     },
+    step(message) {
+      current = message;
+      if (!timer) {
+        timer = setInterval(render, INTERVAL_MS);
+        if (typeof timer.unref === "function") {
+          timer.unref();
+        }
+      }
+      render();
+    },
   };
-}
+};

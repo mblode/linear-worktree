@@ -1,6 +1,23 @@
 import type { LinearIssue, LinearRelatedIssue } from "./types.js";
 
-export function renderPrompt(issue: LinearIssue | undefined, displayId: string): string {
+const renderRelatedIssue = (
+  tag: "parent-issue" | "sub-issue",
+  issue: LinearRelatedIssue
+): string => {
+  let output = `<${tag} identifier="${issue.identifier}">\n`;
+  output += `<id>${issue.id ?? ""}</id>\n`;
+  output += `<title>${issue.title ?? ""}</title>\n`;
+  if (issue.description) {
+    output += `<description>\n${issue.description}\n</description>\n`;
+  }
+  output += `</${tag}>\n`;
+  return output;
+};
+
+export const renderPrompt = (
+  issue: LinearIssue | undefined,
+  displayId: string
+): string => {
   if (!issue) {
     return `Work on Linear issue ${displayId}.`;
   }
@@ -40,15 +57,4 @@ export function renderPrompt(issue: LinearIssue | undefined, displayId: string):
 
   prompt += "</issue>\n";
   return prompt;
-}
-
-function renderRelatedIssue(tag: "parent-issue" | "sub-issue", issue: LinearRelatedIssue): string {
-  let output = `<${tag} identifier="${issue.identifier}">\n`;
-  output += `<id>${issue.id ?? ""}</id>\n`;
-  output += `<title>${issue.title ?? ""}</title>\n`;
-  if (issue.description) {
-    output += `<description>\n${issue.description}\n</description>\n`;
-  }
-  output += `</${tag}>\n`;
-  return output;
-}
+};

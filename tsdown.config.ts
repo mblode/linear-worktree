@@ -11,7 +11,7 @@ export default defineConfig([
     target: "node22",
   },
   {
-    clean: false,
+    dts: true,
     entry: { index: "src/index.ts" },
     format: ["esm"],
     hash: false,

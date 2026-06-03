@@ -1,8 +1,14 @@
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+
 import { afterEach, describe, expect, it } from "vitest";
-import { downloadImage, extractImageUrls, shouldSendLinearAuth } from "./images.js";
+
+import {
+  downloadImage,
+  extractImageUrls,
+  shouldSendLinearAuth,
+} from "./images.js";
 
 const cleanup: string[] = [];
 
@@ -15,8 +21,13 @@ afterEach(async () => {
 describe("image handling", () => {
   it("extracts markdown images and bare Linear upload URLs", () => {
     expect(
-      extractImageUrls("![a](https://example.com/a.png)\nhttps://uploads.linear.app/b.png"),
-    ).toEqual(["https://example.com/a.png", "https://uploads.linear.app/b.png"]);
+      extractImageUrls(
+        "![a](https://example.com/a.png)\nhttps://uploads.linear.app/b.png"
+      )
+    ).toEqual([
+      "https://example.com/a.png",
+      "https://uploads.linear.app/b.png",
+    ]);
   });
 
   it("only sends Linear auth to Linear upload URLs", () => {
@@ -34,15 +45,17 @@ describe("image handling", () => {
       "https://example.com/a.png",
       join(dir, "a.png"),
       "lin_secret",
-      async (_input, init) => {
+      (_input, init) => {
         seenHeaders.push(init?.headers ?? {});
-        return new Response(new Uint8Array([1, 2, 3]));
-      },
+        return Promise.resolve(new Response(new Uint8Array([1, 2, 3])));
+      }
     );
 
     expect(ok).toBe(true);
     expect(seenHeaders).toEqual([{}]);
-    await expect(readFile(join(dir, "a.png"))).resolves.toEqual(Buffer.from([1, 2, 3]));
+    await expect(readFile(join(dir, "a.png"))).resolves.toEqual(
+      Buffer.from([1, 2, 3])
+    );
   });
 
   it("sends the Linear token to Linear upload URLs", async () => {
@@ -54,10 +67,10 @@ describe("image handling", () => {
       "https://uploads.linear.app/a.png",
       join(dir, "a.png"),
       "lin_secret",
-      async (_input, init) => {
+      (_input, init) => {
         seenHeaders.push(init?.headers ?? {});
-        return new Response(new Uint8Array([1]));
-      },
+        return Promise.resolve(new Response(new Uint8Array([1])));
+      }
     );
 
     expect(seenHeaders).toEqual([{ Authorization: "lin_secret" }]);

@@ -9,14 +9,14 @@ Delegate to the globally available `linear-worktree` CLI. Do not reimplement wor
 
 ## Reference Files
 
-| File | Read When |
-|------|-----------|
-| `references/usage-modes.md` | Choosing one issue, many issues, or `--print` |
-| `references/repo-detection.md` | The user is outside the target repo, using `--repo`, or configuring team maps |
-| `references/drive-workspaces.md` | After multi-issue fan-out, when this session needs to inspect or drive spawned cmux workspaces |
-| `references/troubleshooting.md` | The CLI is missing, repo detection fails, cmux is unavailable, or launch mode fails |
-| `references/verification.md` | Validating install, safe behavior, and full parity |
-| `references/evaluation-scenarios.md` | Evaluating future skill/CLI changes |
+| File                                 | Read When                                                                                      |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------- |
+| `references/usage-modes.md`          | Choosing one issue, many issues, or `--print`                                                  |
+| `references/repo-detection.md`       | The user is outside the target repo, using `--repo`, or configuring team maps                  |
+| `references/drive-workspaces.md`     | After multi-issue fan-out, when this session needs to inspect or drive spawned cmux workspaces |
+| `references/troubleshooting.md`      | The CLI is missing, repo detection fails, cmux is unavailable, or launch mode fails            |
+| `references/verification.md`         | Validating install, safe behavior, and full parity                                             |
+| `references/evaluation-scenarios.md` | Evaluating future skill/CLI changes                                                            |
 
 ## Workflow
 

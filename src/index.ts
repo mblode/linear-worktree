@@ -1,4 +1,9 @@
-export { claudeCommand, cmuxReachable, isFanOutInput, openIssueWorkspace } from "./cmux.js";
+export {
+  claudeCommand,
+  cmuxReachable,
+  isFanOutInput,
+  openIssueWorkspace,
+} from "./cmux.js";
 export { CliError } from "./errors.js";
 export { ensureWorktree, fetchOrigin } from "./git.js";
 export {

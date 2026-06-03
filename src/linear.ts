@@ -1,8 +1,12 @@
 import type { LinearGraphqlResponse, LinearIssue } from "./types.js";
 
-const issueQuery = "query($id:String!){issue(id:$id){identifier title description team{name} labels{nodes{name}} project{name} parent{identifier id title description} children(first:50){nodes{identifier id title description}}}}";
+const issueQuery =
+  "query($id:String!){issue(id:$id){identifier title description team{name} labels{nodes{name}} project{name} parent{identifier id title description} children(first:50){nodes{identifier id title description}}}}";
 
-export async function fetchLinearIssue(displayId: string, env: NodeJS.ProcessEnv = process.env): Promise<LinearIssue | undefined> {
+export const fetchLinearIssue = async (
+  displayId: string,
+  env: NodeJS.ProcessEnv = process.env
+): Promise<LinearIssue | undefined> => {
   const apiKey = env.LINEAR_API_KEY;
   if (!apiKey) {
     return undefined;
@@ -27,4 +31,4 @@ export async function fetchLinearIssue(displayId: string, env: NodeJS.ProcessEnv
   } catch {
     return undefined;
   }
-}
+};

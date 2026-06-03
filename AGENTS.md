@@ -11,7 +11,8 @@ npm run dev                 # tsdown --watch
 npm run test                # vitest run
 npm run typecheck           # tsc --noEmit
 npm run lint                # oxlint .
-npm exec -- ultracite fix   # format + lint autofix
+npm run check               # ultracite check (lint + format, CI-equivalent)
+npm run fix                 # ultracite fix (format + lint autofix)
 npm link                    # install linear-worktree globally from this checkout
 ```
 

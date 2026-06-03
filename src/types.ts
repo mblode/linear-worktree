@@ -1,57 +1,57 @@
-export type RunResult = {
+export interface RunResult {
   status: number | null;
   stdout: string;
   stderr: string;
-};
+}
 
-export type RunOptions = {
+export interface RunOptions {
   cwd?: string;
   env?: NodeJS.ProcessEnv;
   input?: string;
   stdio?: "pipe" | "inherit";
-};
+}
 
-export type ParsedIssue = {
+export interface ParsedIssue {
   displayId: string;
   issueId: string;
   slug: string;
-};
+}
 
-export type ResolvedRepo = {
+export interface ResolvedRepo {
   repoRoot: string;
   source: "override" | "team-map" | "cwd" | "env";
-};
+}
 
-export type WorktreeResult = {
+export interface WorktreeResult {
   branch: string;
   worktreePath: string;
-};
+}
 
-export type LinearIssue = {
+export interface LinearIssue {
   identifier: string;
   title?: string | null;
   description?: string | null;
   team?: { name?: string | null } | null;
-  labels?: { nodes?: Array<{ name?: string | null }> | null } | null;
+  labels?: { nodes?: { name?: string | null }[] | null } | null;
   project?: { name?: string | null } | null;
   parent?: LinearRelatedIssue | null;
   children?: { nodes?: LinearRelatedIssue[] | null } | null;
-};
+}
 
-export type LinearRelatedIssue = {
+export interface LinearRelatedIssue {
   identifier: string;
   id?: string | null;
   title?: string | null;
   description?: string | null;
-};
+}
 
-export type LinearGraphqlResponse = {
+export interface LinearGraphqlResponse {
   data?: {
     issue?: LinearIssue | null;
   };
-};
+}
 
-export type CliOptions = {
+export interface CliOptions {
   cwd?: string;
   env?: NodeJS.ProcessEnv;
   print?: boolean;
@@ -59,4 +59,4 @@ export type CliOptions = {
   stdout?: NodeJS.WritableStream;
   stderr?: NodeJS.WritableStream;
   tokens: string[];
-};
+}
