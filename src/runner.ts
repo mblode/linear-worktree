@@ -8,7 +8,7 @@ import { downloadIssueImages } from "./images.js";
 import { parseIssueInput, slugify } from "./issue.js";
 import { fetchLinearIssue } from "./linear.js";
 import { copyCommand, launchPlanMode } from "./launch.js";
-import { createProgress, type Progress } from "./progress.js";
+import { createProgress, type Progress, withPrefix } from "./progress.js";
 import { renderPrompt } from "./prompt.js";
 import { resolveRepo } from "./repo.js";
 import { commandExists } from "./shell.js";
@@ -76,12 +76,15 @@ async function dispatch({
       throw new CliError("claude is not on PATH");
     }
 
+    let index = 0;
     for (const token of tokens) {
-      const prepared = await prepareIssue(token, context);
-      await launchViaCmux(prepared, env, false, progress);
+      index += 1;
+      const scoped = withPrefix(progress, `[${index}/${tokens.length}] ${token.toUpperCase()} · `);
+      const prepared = await prepareIssue(token, { ...context, progress: scoped });
+      await launchViaCmux(prepared, env, false, scoped);
+      progress.done(`opened ${prepared.worktree.branch} (${index}/${tokens.length})`);
     }
 
-    progress.done();
     stdout.write(
       `spawned ${tokens.length} workspaces - each running claude in plan mode from its worktree\n`,
     );

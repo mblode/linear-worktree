@@ -96,10 +96,12 @@ printf '%s\\n' "$*" >> "$CMUX_LOG"
     await writeExecutable(join(binDir, "claude"), "#!/bin/sh\nexit 0\n");
 
     const output = captureWritable();
+    const errput = captureWritable();
     await runLinearWorktree({
       cwd: repo,
       env: { ...safeEnv(), CMUX_LOG: log, PATH: `${binDir}:${safeEnv().PATH}` },
       repoOverride: repo,
+      stderr: errput.stream,
       stdout: output.stream,
       tokens: ["TST-1", "TST-2"],
     });
@@ -110,6 +112,9 @@ printf '%s\\n' "$*" >> "$CMUX_LOG"
     expect(cmuxLog).toContain("--focus false");
     expect(cmuxLog).toContain("claude --permission-mode plan --allow-dangerously-skip-permissions");
     expect(output.value()).toContain("spawned 2 workspaces");
+    expect(errput.value()).toContain("[1/2] TST-1 ·");
+    expect(errput.value()).toContain("opened tst-1 (1/2)");
+    expect(errput.value()).toContain("opened tst-2 (2/2)");
 
     const worktree1 = join(root, "src repo-tst-1");
     expect(

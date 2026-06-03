@@ -10,7 +10,7 @@ export {
 export { isIssueId, parseIssueInput, slugify } from "./issue.js";
 export { fetchLinearIssue } from "./linear.js";
 export { copyCommand, launchPlanMode } from "./launch.js";
-export { createProgress } from "./progress.js";
+export { createProgress, withPrefix } from "./progress.js";
 export { renderPrompt } from "./prompt.js";
 export { expandTilde, resolveRepo } from "./repo.js";
 export { runLinearWorktree } from "./runner.js";

@@ -8,6 +8,13 @@ export type Progress = {
   done: (message?: string) => void;
 };
 
+export function withPrefix(progress: Progress, prefix: string): Progress {
+  return {
+    step: (message) => progress.step(`${prefix}${message}`),
+    done: (message) => progress.done(message ? `${prefix}${message}` : undefined),
+  };
+}
+
 export function createProgress(stream: NodeJS.WritableStream = process.stderr): Progress {
   const isTty = Boolean((stream as Partial<NodeJS.WriteStream>).isTTY);
 
