@@ -110,6 +110,20 @@ describe("runner integration", () => {
     expect(output.value()).toContain(`cd ${worktree}`);
   });
 
+  it("errors when not in a git repo and no --repo is given", async () => {
+    const dir = await realpath(await mkdtemp(join(tmpdir(), "lw-nogit-")));
+    cleanup.push(dir);
+
+    await expect(
+      runLinearWorktree({
+        cwd: dir,
+        env: safeEnv(),
+        print: true,
+        tokens: ["TST-123"],
+      })
+    ).rejects.toThrow(/not in a git repo/u);
+  });
+
   it("reuses an existing worktree on a repeat run instead of erroring", async () => {
     const { repo, root } = await createGitRepo("src");
     cleanup.push(root);

@@ -20,8 +20,6 @@ Run from inside the target repo or pass:
 linear-worktree --repo ~/Code/acme/web ENG-423
 ```
 
-If this is a repeated team, add it to `~/.config/linear-worktree/repos.json`.
-
 ## Default Branch Fails
 
 The source repo needs `origin/HEAD`:

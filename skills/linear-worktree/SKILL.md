@@ -12,7 +12,7 @@ Delegate to the globally available `linear-worktree` CLI. Do not reimplement wor
 | File                                 | Read When                                                                                      |
 | ------------------------------------ | ---------------------------------------------------------------------------------------------- |
 | `references/usage-modes.md`          | Choosing one issue, many issues, or `--print`                                                  |
-| `references/repo-detection.md`       | The user is outside the target repo, using `--repo`, or configuring team maps                  |
+| `references/repo-detection.md`       | The user is outside the target repo or using `--repo`                                          |
 | `references/drive-workspaces.md`     | After multi-issue fan-out, when this session needs to inspect or drive spawned cmux workspaces |
 | `references/troubleshooting.md`      | The CLI is missing, repo detection fails, cmux is unavailable, or launch mode fails            |
 | `references/verification.md`         | Validating install, safe behavior, and full parity                                             |
@@ -59,8 +59,7 @@ command -v linear-worktree
 - **Launch cwd matters.** Claude must start from the new worktree, not the repo that spawned the command.
 - **Multiple IDs fan out.** Two or more bare issue IDs create cmux workspaces instead of doing all work in the current shell.
 - **Use `--print` for safe validation.** It creates the worktree and prints the prompt without opening Claude.
-- **Repo maps are optional.** Without `~/.config/linear-worktree/repos.json`, unmapped teams fall back to the repo you launched from.
-- **Do not call the old dotfiles script.** The TypeScript CLI is canonical.
+- **Repo comes from cwd or `--repo`.** Run from inside the target repo, or pass `--repo <path>` when outside it.
 
 ## Related Skills
 

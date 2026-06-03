@@ -3,20 +3,10 @@
 The CLI chooses a repo per issue. First match wins:
 
 1. `--repo <path>`
-2. Team map at `~/.config/linear-worktree/repos.json`
-3. Current git repo
-4. `LINEAR_WORKTREE_REPO`
+2. Current git repo (the directory you run the command from)
 
-## Team Map
-
-```json
-{
-  "ENG": "~/Code/acme/web",
-  "WEB": "~/Code/acme/api"
-}
-```
-
-Use a team map when the user pastes mixed-team IDs from outside the target repos. The map is optional. Missing keys fall back to the current repo.
+If neither resolves, the CLI errors. Run it from inside the target repo, or
+pass `--repo <path>` when you're outside it.
 
 ## Worktree Location
 

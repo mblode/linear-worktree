@@ -88,7 +88,6 @@ const prepareIssue = async (
   const repo = resolveRepo({
     cwd,
     env,
-    issueId: parsedIssue.issueId,
     repoOverride: context.repoOverride,
   });
 

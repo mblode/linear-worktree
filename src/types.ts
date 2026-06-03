@@ -19,7 +19,6 @@ export interface ParsedIssue {
 
 export interface ResolvedRepo {
   repoRoot: string;
-  source: "override" | "team-map" | "cwd" | "env";
 }
 
 export interface WorktreeResult {
