@@ -7,7 +7,7 @@ Use these scenarios when changing the skill or CLI.
 Query:
 
 ```text
-linear-worktree TIG-423
+linear-worktree ENG-423
 ```
 
 Expected behavior:
@@ -37,7 +37,7 @@ Expected behavior:
 Query:
 
 ```text
-spin up TIG-423 TIG-424 CURA-12
+spin up ENG-423 ENG-424 WEB-12
 ```
 
 Expected behavior:

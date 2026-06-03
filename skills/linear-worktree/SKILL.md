@@ -1,6 +1,6 @@
 ---
 name: linear-worktree
-description: Creates git worktrees for Linear issues with the globally installed linear-worktree CLI, then launches Claude from the created worktree or fans out cmux workspaces for multiple issues. Use when the user says "linear-worktree", "start this Linear issue", "make a worktree", "spin up workspaces", gives issue IDs like "TIG-423", or asks to verify the linear-worktree CLI.
+description: Creates git worktrees for Linear issues with the globally installed linear-worktree CLI, then launches Claude from the created worktree or fans out cmux workspaces for multiple issues. Use when the user says "linear-worktree", "start this Linear issue", "make a worktree", "spin up workspaces", gives issue IDs like "ENG-423", or asks to verify the linear-worktree CLI.
 ---
 
 # linear-worktree
@@ -36,9 +36,9 @@ linear-worktree progress:
    linear-worktree --help
    ```
 2. Choose mode:
-   - One issue: `linear-worktree TIG-423`
-   - Many bare issue IDs: `linear-worktree TIG-423 TIG-424`
-   - Safe prompt/worktree only: `linear-worktree --print TIG-423`
+   - One issue: `linear-worktree ENG-423`
+   - Many bare issue IDs: `linear-worktree ENG-423 ENG-424`
+   - Safe prompt/worktree only: `linear-worktree --print ENG-423`
 3. Run from the intended repo, or pass `--repo <path>`.
 4. In launch mode, the CLI creates the worktree, starts Claude with `--dangerously-skip-permissions`, and runs Claude from the new worktree directory.
 

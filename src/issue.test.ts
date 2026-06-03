@@ -4,17 +4,17 @@ import { parseIssueInput, slugify } from "./issue.js";
 
 describe("issue parsing", () => {
   it("parses bare issue IDs", () => {
-    expect(parseIssueInput("TIG-423")).toEqual({
-      displayId: "TIG-423",
-      issueId: "tig-423",
+    expect(parseIssueInput("ENG-423")).toEqual({
+      displayId: "ENG-423",
+      issueId: "eng-423",
       slug: "",
     });
   });
 
   it("parses issue IDs with slug words", () => {
-    expect(parseIssueInput("tig-423 Add launch mode")).toEqual({
-      displayId: "TIG-423",
-      issueId: "tig-423",
+    expect(parseIssueInput("eng-423 Add launch mode")).toEqual({
+      displayId: "ENG-423",
+      issueId: "eng-423",
       slug: "add-launch-mode",
     });
   });
@@ -22,11 +22,11 @@ describe("issue parsing", () => {
   it("parses Linear issue URLs", () => {
     expect(
       parseIssueInput(
-        "https://linear.app/linktree/issue/TIG-423/add-launch-mode?foo=bar"
+        "https://linear.app/acme/issue/ENG-423/add-launch-mode?foo=bar"
       )
     ).toEqual({
-      displayId: "TIG-423",
-      issueId: "tig-423",
+      displayId: "ENG-423",
+      issueId: "eng-423",
       slug: "add-launch-mode",
     });
   });

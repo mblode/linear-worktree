@@ -5,7 +5,7 @@ Use the smallest mode that matches the user's request.
 ## One Issue
 
 ```bash
-linear-worktree TIG-423
+linear-worktree ENG-423
 ```
 
 Creates a sibling worktree, changes launch cwd to that worktree, and starts:
@@ -19,7 +19,7 @@ The prompt is Linear's issue context plus local screenshot paths when `LINEAR_AP
 ## Many Issues
 
 ```bash
-linear-worktree TIG-423 TIG-424 CURA-12
+linear-worktree ENG-423 ENG-424 WEB-12
 ```
 
 Every token must be a bare issue ID. The CLI creates one cmux workspace per issue. Each workspace runs `linear-worktree <id>`, so the worktree is created inside that workspace before Claude opens from the created worktree.
@@ -27,7 +27,7 @@ Every token must be a bare issue ID. The CLI creates one cmux workspace per issu
 ## Print Only
 
 ```bash
-linear-worktree --print TIG-423
+linear-worktree --print ENG-423
 ```
 
 Use this for validation, review, or handoff. It creates the worktree, prints the prompt, copies the `cd` command when clipboard tooling exists, and does not launch Claude.
@@ -35,7 +35,7 @@ Use this for validation, review, or handoff. It creates the worktree, prints the
 ## ID Plus Slug
 
 ```bash
-linear-worktree TIG-423 add launch mode
+linear-worktree ENG-423 add launch mode
 ```
 
 Treats the first token as the issue ID and the rest as the branch slug. This is single-issue mode, not fan-out.

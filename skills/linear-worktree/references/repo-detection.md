@@ -11,8 +11,8 @@ The CLI chooses a repo per issue. First match wins:
 
 ```json
 {
-  "TIG": "~/Code/linktree/frontyard",
-  "CURA": "~/Code/linktree/discover"
+  "ENG": "~/Code/acme/web",
+  "WEB": "~/Code/acme/api"
 }
 ```
 
@@ -23,8 +23,8 @@ Use a team map when the user pastes mixed-team IDs from outside the target repos
 Worktrees are siblings of the resolved repo:
 
 ```text
-~/Code/linktree/frontyard      -> ~/Code/linktree/frontyard-tig-423
-~/Code/linktree/discover       -> ~/Code/linktree/discover-cura-12
+~/Code/acme/web      -> ~/Code/acme/web-eng-423
+~/Code/acme/api       -> ~/Code/acme/api-web-12
 ```
 
 Do not create nested worktrees inside the source repo.

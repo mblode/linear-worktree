@@ -11,42 +11,42 @@ describe("prompt rendering", () => {
           {
             description: "Child body",
             id: "child-uuid",
-            identifier: "TIG-404",
+            identifier: "ENG-404",
             title: "Child task",
           },
         ],
       },
       description:
         "Raw markdown with ![shot](https://uploads.linear.app/file.png)",
-      identifier: "TIG-403",
+      identifier: "ENG-403",
       labels: { nodes: [{ name: "Frontend" }, { name: "Bug" }] },
       parent: {
         id: "parent-uuid",
-        identifier: "TIG-400",
+        identifier: "ENG-400",
         title: "Parent task",
       },
       project: { name: "Activation" },
-      team: { name: "Frontyard" },
+      team: { name: "Engineering" },
       title: "Fix launch flow",
     };
 
-    const prompt = renderPrompt(issue, "TIG-403");
+    const prompt = renderPrompt(issue, "ENG-403");
 
-    expect(prompt).toContain("Work on Linear issue TIG-403:");
-    expect(prompt).toContain('<issue identifier="TIG-403">');
-    expect(prompt).toContain('<team name="Frontyard"/>');
+    expect(prompt).toContain("Work on Linear issue ENG-403:");
+    expect(prompt).toContain('<issue identifier="ENG-403">');
+    expect(prompt).toContain('<team name="Engineering"/>');
     expect(prompt).toContain("<label>Frontend</label>");
     expect(prompt).toContain('<project name="Activation"/>');
-    expect(prompt).toContain('<parent-issue identifier="TIG-400">');
+    expect(prompt).toContain('<parent-issue identifier="ENG-400">');
     expect(prompt).toContain("<id>parent-uuid</id>");
-    expect(prompt).toContain('<sub-issue identifier="TIG-404">');
+    expect(prompt).toContain('<sub-issue identifier="ENG-404">');
     expect(prompt).toContain("<id>child-uuid</id>");
     expect(prompt).not.toContain("<url>");
   });
 
   it("falls back when Linear data is unavailable", () => {
-    expect(renderPrompt(undefined, "TIG-999")).toBe(
-      "Work on Linear issue TIG-999."
+    expect(renderPrompt(undefined, "ENG-999")).toBe(
+      "Work on Linear issue ENG-999."
     );
   });
 });

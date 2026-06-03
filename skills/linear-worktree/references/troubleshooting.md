@@ -17,7 +17,7 @@ command -v linear-worktree
 Run from inside the target repo or pass:
 
 ```bash
-linear-worktree --repo ~/Code/linktree/frontyard TIG-423
+linear-worktree --repo ~/Code/acme/web ENG-423
 ```
 
 If this is a repeated team, add it to `~/.config/linear-worktree/repos.json`.
@@ -45,5 +45,5 @@ command -v claude
 Use `--print` to validate worktree and prompt generation without launching:
 
 ```bash
-linear-worktree --print TIG-423
+linear-worktree --print ENG-423
 ```

@@ -22,10 +22,10 @@ linear-worktree --help
 ## Usage
 
 ```bash
-linear-worktree TIG-403
-linear-worktree TIG-403 TIG-404 CURA-12
-linear-worktree --print TIG-403
-linear-worktree --repo ~/Code/linktree/frontyard TIG-403
+linear-worktree ENG-403
+linear-worktree ENG-403 ENG-404 WEB-12
+linear-worktree --print ENG-403
+linear-worktree --repo ~/Code/acme/web ENG-403
 ```
 
 ## Behavior
