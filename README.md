@@ -29,6 +29,14 @@ export LINEAR_API_KEY=lin_api_...
 
 Create a key in Linear's [API settings](https://linear.app/settings/api).
 
+## Agent skill
+
+This repo ships an agent skill that teaches your coding agent to run the CLI for you. Install it globally:
+
+```bash
+npx skills add mblode/linear-worktree -g --all -y
+```
+
 ## Requirements
 
 - Node.js >= 22
