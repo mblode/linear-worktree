@@ -39,7 +39,7 @@ Create a key in Linear's [API settings](https://linear.app/settings/api).
 This repo ships an agent skill that teaches your coding agent to run the CLI for you. Install it globally:
 
 ```bash
-npx skills add mblode/linear-worktree -g --all -y
+npx skills add mblode/linear-worktree -g
 ```
 
 ## Requirements
