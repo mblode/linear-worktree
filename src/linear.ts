@@ -1,4 +1,4 @@
-import type { LinearGraphqlResponse, LinearIssue } from "./types.js";
+import type { FetchLike, LinearGraphqlResponse, LinearIssue } from "./types.js";
 
 const FETCH_TIMEOUT_MS = 15_000;
 
@@ -7,7 +7,8 @@ const issueQuery =
 
 export const fetchLinearIssue = async (
   displayId: string,
-  env: NodeJS.ProcessEnv = process.env
+  env: NodeJS.ProcessEnv = process.env,
+  fetchImpl: FetchLike = fetch
 ): Promise<LinearIssue | undefined> => {
   const apiKey = env.LINEAR_API_KEY;
   if (!apiKey) {
@@ -15,7 +16,7 @@ export const fetchLinearIssue = async (
   }
 
   try {
-    const response = await fetch("https://api.linear.app/graphql", {
+    const response = await fetchImpl("https://api.linear.app/graphql", {
       body: JSON.stringify({ query: issueQuery, variables: { id: displayId } }),
       headers: {
         Authorization: apiKey,

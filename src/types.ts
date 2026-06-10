@@ -1,3 +1,5 @@
+export type FetchLike = typeof fetch;
+
 export interface RunResult {
   status: number | null;
   stdout: string;

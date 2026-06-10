@@ -2,8 +2,7 @@ import { mkdir, stat, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 import { issueScratchDir } from "./paths.js";
-
-type FetchLike = typeof fetch;
+import type { FetchLike } from "./types.js";
 
 const FETCH_TIMEOUT_MS = 15_000;
 
