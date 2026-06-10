@@ -7,6 +7,8 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
@@ -14,7 +16,7 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "isolatedModules": true
+    "verbatimModuleSyntax": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "**/*.test.ts"]
