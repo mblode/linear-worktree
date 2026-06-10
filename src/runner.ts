@@ -99,6 +99,11 @@ const prepareIssue = async (
   progress.step("git fetch origin");
   fetchOrigin(repo.repoRoot, env);
   const issue = await issuePromise;
+  if (!issue && env.LINEAR_API_KEY) {
+    progress.warn(
+      `could not fetch ${parsedIssue.displayId} from Linear; using fallback prompt`
+    );
+  }
 
   const slug = parsedIssue.slug || (issue?.title ? slugify(issue.title) : "");
 
@@ -127,7 +132,46 @@ const prepareIssue = async (
   return { displayId: parsedIssue.displayId, prompt, worktree };
 };
 
-const dispatch = async ({
+const dispatchFanOut = async ({
+  context,
+  env,
+  progress,
+  stdout,
+  tokens,
+}: DispatchArgs): Promise<number> => {
+  if (!cmuxReachable(env)) {
+    throw new CliError(
+      "cmux is not reachable (needed for multi-issue fan-out)"
+    );
+  }
+  if (!commandExists("claude", env)) {
+    throw new CliError("claude is not on PATH");
+  }
+
+  let index = 0;
+  for (const token of tokens) {
+    index += 1;
+    const scoped = withPrefix(
+      progress,
+      `[${index}/${tokens.length}] ${token.toUpperCase()} · `
+    );
+    const prepared = await prepareIssue(token, {
+      ...context,
+      progress: scoped,
+    });
+    await launchViaCmux(prepared, env, false, scoped);
+    progress.done(
+      `opened ${prepared.worktree.branch} (${index}/${tokens.length})`
+    );
+  }
+
+  stdout.write(
+    `spawned ${tokens.length} workspaces - each running claude in plan mode from its worktree\n`
+  );
+  return 0;
+};
+
+const dispatchSingle = async ({
   context,
   env,
   options,
@@ -135,39 +179,6 @@ const dispatch = async ({
   stdout,
   tokens,
 }: DispatchArgs): Promise<number> => {
-  if (isFanOutInput(tokens, Boolean(options.print))) {
-    if (!cmuxReachable(env)) {
-      throw new CliError(
-        "cmux is not reachable (needed for multi-issue fan-out)"
-      );
-    }
-    if (!commandExists("claude", env)) {
-      throw new CliError("claude is not on PATH");
-    }
-
-    let index = 0;
-    for (const token of tokens) {
-      index += 1;
-      const scoped = withPrefix(
-        progress,
-        `[${index}/${tokens.length}] ${token.toUpperCase()} · `
-      );
-      const prepared = await prepareIssue(token, {
-        ...context,
-        progress: scoped,
-      });
-      await launchViaCmux(prepared, env, false, scoped);
-      progress.done(
-        `opened ${prepared.worktree.branch} (${index}/${tokens.length})`
-      );
-    }
-
-    stdout.write(
-      `spawned ${tokens.length} workspaces - each running claude in plan mode from its worktree\n`
-    );
-    return 0;
-  }
-
   const prepared = await prepareIssue(tokens.join(" "), context);
 
   if (options.print) {
@@ -193,6 +204,11 @@ const dispatch = async ({
   progress.done();
   return launchPlanMode(prepared.worktree.worktreePath, prepared.prompt, env);
 };
+
+const dispatch = (args: DispatchArgs): Promise<number> =>
+  !args.options.print && isFanOutInput(args.tokens)
+    ? dispatchFanOut(args)
+    : dispatchSingle(args);
 
 export const runLinearWorktree = async (
   options: CliOptions

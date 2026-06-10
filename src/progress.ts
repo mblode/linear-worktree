@@ -5,12 +5,14 @@ const CLEAR_LINE = "\r\u001B[2K";
 
 export interface Progress {
   step: (message: string) => void;
+  warn: (message: string) => void;
   done: (message?: string) => void;
 }
 
 export const withPrefix = (progress: Progress, prefix: string): Progress => ({
   done: (message) => progress.done(message ? `${prefix}${message}` : undefined),
   step: (message) => progress.step(`${prefix}${message}`),
+  warn: (message) => progress.warn(`${prefix}${message}`),
 });
 
 export const createProgress = (
@@ -26,6 +28,9 @@ export const createProgress = (
         }
       },
       step(message) {
+        stream.write(`[${LABEL}] ${message}\n`);
+      },
+      warn(message) {
         stream.write(`[${LABEL}] ${message}\n`);
       },
     };
@@ -60,6 +65,10 @@ export const createProgress = (
         }
       }
       render();
+    },
+    warn(message) {
+      // Print the warning on its own line; the next render redraws the spinner.
+      stream.write(`${CLEAR_LINE}[${LABEL}] ${message}\n`);
     },
   };
 };

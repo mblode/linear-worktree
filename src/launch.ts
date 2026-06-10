@@ -1,6 +1,12 @@
 import { CliError } from "./errors.js";
 import { commandExists, run } from "./shell.js";
 
+export const CLAUDE_PLAN_ARGS = [
+  "--permission-mode",
+  "plan",
+  "--allow-dangerously-skip-permissions",
+] as const;
+
 export const copyCommand = (command: string, env: NodeJS.ProcessEnv): void => {
   if (commandExists("pbcopy", env)) {
     run("pbcopy", [], { env, input: command });
@@ -24,20 +30,11 @@ export const launchPlanMode = (
     throw new CliError("claude is not on PATH (use --print to skip launching)");
   }
 
-  const result = run(
-    "claude",
-    [
-      "--permission-mode",
-      "plan",
-      "--allow-dangerously-skip-permissions",
-      prompt,
-    ],
-    {
-      cwd: worktreePath,
-      env,
-      stdio: "inherit",
-    }
-  );
+  const result = run("claude", [...CLAUDE_PLAN_ARGS, prompt], {
+    cwd: worktreePath,
+    env,
+    stdio: "inherit",
+  });
 
   return result.status ?? 1;
 };

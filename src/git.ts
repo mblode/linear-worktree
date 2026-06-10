@@ -15,8 +15,21 @@ interface EnsureWorktreeOptions {
   skipFetch?: boolean;
 }
 
+const git = (repoRoot: string, env: NodeJS.ProcessEnv) => ({
+  ok: (...args: string[]): boolean =>
+    run("git", ["-C", repoRoot, ...args], { env }).status === 0,
+  out: (...args: string[]): string | undefined => {
+    const result = run("git", ["-C", repoRoot, ...args], { env });
+    return result.status === 0 ? result.stdout.trim() : undefined;
+  },
+  require: (...args: string[]): string =>
+    runRequired("git", ["-C", repoRoot, ...args], { env }),
+});
+
+type GitRunner = ReturnType<typeof git>;
+
 export const fetchOrigin = (repoRoot: string, env: NodeJS.ProcessEnv): void => {
-  run("git", ["-C", repoRoot, "fetch", "origin", "--quiet"], { env });
+  git(repoRoot, env).ok("fetch", "origin", "--quiet");
 };
 
 const reuseExistingWorktree = (
@@ -28,99 +41,48 @@ const reuseExistingWorktree = (
     return undefined;
   }
 
-  const toplevel = run(
-    "git",
-    ["-C", worktreePath, "rev-parse", "--show-toplevel"],
-    { env }
-  );
-  if (toplevel.status !== 0 || toplevel.stdout.trim() !== worktreePath) {
+  const worktree = git(worktreePath, env);
+  if (worktree.out("rev-parse", "--show-toplevel") !== worktreePath) {
     throw new CliError(
       `${worktreePath} already exists and is not a git worktree`
     );
   }
 
-  const headBranch = run(
-    "git",
-    ["-C", worktreePath, "symbolic-ref", "--quiet", "--short", "HEAD"],
-    {
-      env,
-    }
-  );
   return {
-    branch: headBranch.status === 0 ? headBranch.stdout.trim() : branch,
+    branch:
+      worktree.out("symbolic-ref", "--quiet", "--short", "HEAD") ?? branch,
     worktreePath,
   };
 };
 
 const addWorktree = (
-  repoRoot: string,
+  repo: GitRunner,
   worktreePath: string,
-  branch: string,
-  env: NodeJS.ProcessEnv
+  branch: string
 ): void => {
-  if (
-    run(
-      "git",
-      [
-        "-C",
-        repoRoot,
-        "show-ref",
-        "--verify",
-        "--quiet",
-        `refs/heads/${branch}`,
-      ],
-      { env }
-    ).status === 0
-  ) {
-    runRequired(
-      "git",
-      ["-C", repoRoot, "worktree", "add", worktreePath, branch],
-      { env }
-    );
+  if (repo.ok("show-ref", "--verify", "--quiet", `refs/heads/${branch}`)) {
+    repo.require("worktree", "add", worktreePath, branch);
     return;
   }
 
   if (
-    run(
-      "git",
-      [
-        "-C",
-        repoRoot,
-        "show-ref",
-        "--verify",
-        "--quiet",
-        `refs/remotes/origin/${branch}`,
-      ],
-      { env }
-    ).status === 0
+    repo.ok("show-ref", "--verify", "--quiet", `refs/remotes/origin/${branch}`)
   ) {
-    runRequired(
-      "git",
-      [
-        "-C",
-        repoRoot,
-        "worktree",
-        "add",
-        "--track",
-        "-b",
-        branch,
-        worktreePath,
-        `origin/${branch}`,
-      ],
-      { env }
+    repo.require(
+      "worktree",
+      "add",
+      "--track",
+      "-b",
+      branch,
+      worktreePath,
+      `origin/${branch}`
     );
     return;
   }
 
-  const defaultBranchOutput = run(
-    "git",
-    ["-C", repoRoot, "symbolic-ref", "--short", "refs/remotes/origin/HEAD"],
-    { env }
-  );
-  const defaultBranch =
-    defaultBranchOutput.status === 0
-      ? defaultBranchOutput.stdout.trim().replace(/^origin\//u, "")
-      : "";
+  const defaultBranch = repo
+    .out("symbolic-ref", "--short", "refs/remotes/origin/HEAD")
+    ?.replace(/^origin\//u, "");
   if (!defaultBranch) {
     throw new CliError(
       "cannot resolve origin's default branch (try: git remote set-head origin --auto)"
@@ -128,23 +90,11 @@ const addWorktree = (
   }
 
   const baseRef = `refs/remotes/origin/${defaultBranch}`;
-  if (
-    run(
-      "git",
-      ["-C", repoRoot, "rev-parse", "--verify", `${baseRef}^{commit}`],
-      { env }
-    ).status !== 0
-  ) {
+  if (!repo.ok("rev-parse", "--verify", `${baseRef}^{commit}`)) {
     throw new CliError(`missing ${baseRef}`);
   }
 
-  runRequired(
-    "git",
-    ["-C", repoRoot, "worktree", "add", "-b", branch, worktreePath, baseRef],
-    {
-      env,
-    }
-  );
+  repo.require("worktree", "add", "-b", branch, worktreePath, baseRef);
 };
 
 const acquireLock = async (lockDir: string): Promise<void> => {
@@ -174,6 +124,7 @@ export const ensureWorktree = async (
     dirname(options.repoRoot),
     `${basename(options.repoRoot)}-${options.issueId}`
   );
+  const repo = git(options.repoRoot, options.env);
 
   // Re-running for an issue is a no-op: reuse the existing worktree as-is.
   const existing = reuseExistingWorktree(worktreePath, branch, options.env);
@@ -181,15 +132,7 @@ export const ensureWorktree = async (
     return existing;
   }
 
-  if (
-    run(
-      "git",
-      ["-C", options.repoRoot, "check-ref-format", "--branch", branch],
-      {
-        env: options.env,
-      }
-    ).status !== 0
-  ) {
+  if (!repo.ok("check-ref-format", "--branch", branch)) {
     throw new CliError(`invalid branch name: ${branch}`);
   }
 
@@ -197,17 +140,8 @@ export const ensureWorktree = async (
     fetchOrigin(options.repoRoot, options.env);
   }
 
-  const commonDirRaw = run(
-    "git",
-    ["-C", options.repoRoot, "rev-parse", "--git-common-dir"],
-    {
-      env: options.env,
-    }
-  );
   const commonDir =
-    commonDirRaw.status === 0
-      ? commonDirRaw.stdout.trim()
-      : join(options.repoRoot, ".git");
+    repo.out("rev-parse", "--git-common-dir") ?? join(options.repoRoot, ".git");
   const absoluteCommonDir = isAbsolute(commonDir)
     ? commonDir
     : join(options.repoRoot, commonDir);
@@ -216,32 +150,19 @@ export const ensureWorktree = async (
   await acquireLock(lockDir);
   try {
     // Clear stale registrations whose directories were deleted out from under git.
-    run("git", ["-C", options.repoRoot, "worktree", "prune"], {
-      env: options.env,
-    });
-    addWorktree(options.repoRoot, worktreePath, branch, options.env);
+    repo.ok("worktree", "prune");
+    addWorktree(repo, worktreePath, branch);
   } finally {
     await releaseLock(lockDir);
   }
 
-  const toplevel = runRequired(
-    "git",
-    ["-C", worktreePath, "rev-parse", "--show-toplevel"],
-    {
-      env: options.env,
-    }
-  );
-  const headBranch = runRequired(
-    "git",
-    ["-C", worktreePath, "symbolic-ref", "--quiet", "--short", "HEAD"],
-    { env: options.env }
-  );
-
-  if (toplevel !== worktreePath) {
+  const worktree = git(worktreePath, options.env);
+  if (worktree.require("rev-parse", "--show-toplevel") !== worktreePath) {
     throw new CliError("worktree path mismatch");
   }
-
-  if (headBranch !== branch) {
+  if (
+    worktree.require("symbolic-ref", "--quiet", "--short", "HEAD") !== branch
+  ) {
     throw new CliError("worktree HEAD mismatch");
   }
 

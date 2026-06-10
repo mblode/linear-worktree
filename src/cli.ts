@@ -7,9 +7,13 @@ import { Command } from "commander";
 import { CliError } from "./errors.js";
 import { runLinearWorktree } from "./runner.js";
 
-const packageJson = JSON.parse(
-  readFileSync(join(import.meta.dirname, "..", "package.json"), "utf-8")
-) as { version: string };
+const readVersion = (): string => {
+  const parsed: unknown = JSON.parse(
+    readFileSync(join(import.meta.dirname, "..", "package.json"), "utf-8")
+  );
+  const { version } = parsed as Record<string, unknown>;
+  return typeof version === "string" ? version : "0.0.0";
+};
 
 const program = new Command();
 
@@ -18,7 +22,7 @@ program
   .description(
     "Create git worktrees for Linear issues and launch Claude sessions"
   )
-  .version(packageJson.version)
+  .version(readVersion())
   .option(
     "--print",
     "create the worktree and print the prompt without launching"

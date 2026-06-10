@@ -29,6 +29,17 @@ describe("createProgress", () => {
     );
   });
 
+  it("writes warnings as prefixed lines on non-TTY streams", () => {
+    const { stream, value } = captureStream(false);
+    const progress = createProgress(stream);
+
+    progress.warn("could not fetch ENG-1 from Linear; using fallback prompt");
+
+    expect(value()).toBe(
+      "[linear-worktree] could not fetch ENG-1 from Linear; using fallback prompt\n"
+    );
+  });
+
   it("writes nothing for done() without a message on non-TTY streams", () => {
     const { stream, value } = captureStream(false);
     const progress = createProgress(stream);
@@ -57,11 +68,12 @@ describe("withPrefix", () => {
     const progress = withPrefix(createProgress(stream), "[1/2] TST-1 · ");
 
     progress.step("creating worktree");
+    progress.warn("no Linear data");
     progress.done("opened tst-1");
     progress.done();
 
     expect(value()).toBe(
-      "[linear-worktree] [1/2] TST-1 · creating worktree\n[linear-worktree] [1/2] TST-1 · opened tst-1\n"
+      "[linear-worktree] [1/2] TST-1 · creating worktree\n[linear-worktree] [1/2] TST-1 · no Linear data\n[linear-worktree] [1/2] TST-1 · opened tst-1\n"
     );
   });
 });
