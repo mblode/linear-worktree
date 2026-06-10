@@ -1,7 +1,11 @@
 import { mkdir, stat, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
+import { issueScratchDir } from "./paths.js";
+
 type FetchLike = typeof fetch;
+
+const FETCH_TIMEOUT_MS = 15_000;
 
 export const extractImageUrls = (description: string): string[] => {
   const urls = new Set<string>();
@@ -56,6 +60,7 @@ const fetchWithRedirectPolicy = async (
         ? { Authorization: apiKey }
         : undefined,
       redirect: "manual",
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     });
 
     if (response.status >= 300 && response.status < 400) {
@@ -88,7 +93,12 @@ export const downloadImage = async (
     return false;
   }
 
-  const response = await fetchWithRedirectPolicy(parsed, apiKey, fetchImpl);
+  let response: Response | undefined;
+  try {
+    response = await fetchWithRedirectPolicy(parsed, apiKey, fetchImpl);
+  } catch {
+    return false;
+  }
   if (!response?.ok) {
     return false;
   }
@@ -114,7 +124,7 @@ export const downloadIssueImages = async (
     return [];
   }
 
-  const imageDir = join("/tmp", "linear-worktree", displayId);
+  const imageDir = issueScratchDir(displayId);
   await mkdir(imageDir, { recursive: true });
 
   const results = await Promise.all(

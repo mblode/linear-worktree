@@ -24,8 +24,6 @@ export const launchPlanMode = (
     throw new CliError("claude is not on PATH (use --print to skip launching)");
   }
 
-  const previousCwd = process.cwd();
-  process.chdir(worktreePath);
   const result = run(
     "claude",
     [
@@ -35,11 +33,11 @@ export const launchPlanMode = (
       prompt,
     ],
     {
+      cwd: worktreePath,
       env,
       stdio: "inherit",
     }
   );
-  process.chdir(previousCwd);
 
   return result.status ?? 1;
 };

@@ -1,7 +1,7 @@
 const FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
 const INTERVAL_MS = 80;
 const LABEL = "linear-worktree";
-const CLEAR_LINE = "\r[2K";
+const CLEAR_LINE = "\r\u001B[2K";
 
 export interface Progress {
   step: (message: string) => void;

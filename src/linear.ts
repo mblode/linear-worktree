@@ -1,5 +1,7 @@
 import type { LinearGraphqlResponse, LinearIssue } from "./types.js";
 
+const FETCH_TIMEOUT_MS = 15_000;
+
 const issueQuery =
   "query($id:String!){issue(id:$id){identifier title description team{name} labels{nodes{name}} project{name} parent{identifier id title description} children(first:50){nodes{identifier id title description}}}}";
 
@@ -20,6 +22,7 @@ export const fetchLinearIssue = async (
         "Content-Type": "application/json",
       },
       method: "POST",
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     });
 
     if (!response.ok) {

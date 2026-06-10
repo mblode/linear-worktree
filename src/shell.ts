@@ -1,5 +1,6 @@
 import { spawnSync } from "node:child_process";
 
+import { CliError } from "./errors.js";
 import type { RunOptions, RunResult } from "./types.js";
 
 export const run = (
@@ -34,7 +35,9 @@ export const runRequired = (
   if (result.status !== 0) {
     const rendered = [command, ...args].join(" ");
     const details = result.stderr.trim() || result.stdout.trim();
-    throw new Error(details ? `${rendered}: ${details}` : `${rendered} failed`);
+    throw new CliError(
+      details ? `${rendered}: ${details}` : `${rendered} failed`
+    );
   }
   return result.stdout.trim();
 };

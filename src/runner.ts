@@ -9,6 +9,7 @@ import { downloadIssueImages } from "./images.js";
 import { parseIssueInput, slugify } from "./issue.js";
 import { copyCommand, launchPlanMode } from "./launch.js";
 import { fetchLinearIssue } from "./linear.js";
+import { issueScratchDir } from "./paths.js";
 import { createProgress, withPrefix } from "./progress.js";
 import type { Progress } from "./progress.js";
 import { renderPrompt } from "./prompt.js";
@@ -52,7 +53,7 @@ const writePromptFile = async (
   displayId: string,
   prompt: string
 ): Promise<string> => {
-  const dir = join("/tmp", "linear-worktree", displayId);
+  const dir = issueScratchDir(displayId);
   await mkdir(dir, { recursive: true });
   const promptPath = join(dir, "prompt.txt");
   await writeFile(promptPath, prompt);
