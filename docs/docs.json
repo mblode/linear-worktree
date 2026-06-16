@@ -1,0 +1,23 @@
+{
+  "$schema": "https://blode.md/docs.json",
+  "name": "Linear Worktree",
+  "slug": "linear-worktree",
+  "description": "Create a git worktree for a Linear issue and open it in Claude",
+  "navbar": {
+    "links": [
+      {
+        "label": "npm",
+        "href": "https://www.npmjs.com/package/linear-worktree"
+      },
+      { "label": "GitHub", "href": "https://github.com/mblode/linear-worktree" }
+    ]
+  },
+  "navigation": {
+    "groups": [
+      {
+        "group": "Getting Started",
+        "pages": ["index", "usage"]
+      }
+    ]
+  }
+}
